@@ -1,6 +1,6 @@
 /* SFWRENG/CS 3SH3 - Lab 3, Part I: Banking System Problem
- * Compile: gcc PLmutex.c -o PLmutex -pthread
- * Run:     ./PLmutex 100 50
+ * Compile: gcc lab_p1.c -o lab3 -pthreads
+ * Run:     ./lab3 100 50
  */
 #include <pthread.h>
 #include <stdio.h>
@@ -19,30 +19,41 @@ int main(int argc, char *argv[])
     pthread_t tid[NUM_THREADS];   /* thread identifiers */
     pthread_attr_t attr;          /* set of thread attributes */
 
-    /* TODO: check argc == 3, print usage message and exit if not */
+    if (argc != 3) {
+        printf("Usage: %s <deposit amount> <withdraw amount>\n", argv[0]);
+        return 1;
+    }
 
-    /* TODO: initialize the mutex with pthread_mutex_init(&mutex, NULL)
-     *       print an error message if it does not return 0 */
+    if (pthread_mutex_init(&mutex, NULL) != 0) {
+        printf("Error: mutex init failed\n");
+        return 1;
+    }
 
-    /* set the default attributes of the threads */
     pthread_attr_init(&attr);
 
-    /* TODO: create 3 threads that run deposit(), passing argv[1]
-     *   for (i = 0; i < 3; i++)
-     *       pthread_create(&tid[i], &attr, deposit, argv[1]);
-     *   print an error message if pthread_create fails */
+    int i = 0;
 
-    /* TODO: create 3 threads that run withdraw(), passing argv[2]
-     *   use tid[3], tid[4], tid[5]
-     *   print an error message if pthread_create fails */
+    for (i = 0; i < 3; i++) {
+        if (pthread_create(&tid[i], &attr, deposit, argv[1]) != 0) {
+            printf("Error: failed to create deposit thread %d\n", i);
+            return 1;
+        }
+    }
 
-    /* TODO: wait for all 6 threads to finish
-     *   for (i = 0; i < NUM_THREADS; i++)
-     *       pthread_join(tid[i], NULL); */
+    for (i = 3; i < 6; i++) {
+        if (pthread_create(&tid[i], &attr, withdraw, argv[2]) != 0) {
+            printf("Error: failed to create withdraw thread %d\n", i);
+            return 1;
+        }
+    }
 
-    /* TODO: destroy the mutex with pthread_mutex_destroy(&mutex) */
+    for (i = 0; i < NUM_THREADS; i++) {
+        pthread_join(tid[i], NULL);
+    }
 
-    /* TODO: print the final amount, e.g. printf("Final amount = %d\n", amount); */
+    pthread_mutex_destroy(&mutex);
+
+    printf("Final amount = %d\n", amount); 
 
     return 0;
 }
