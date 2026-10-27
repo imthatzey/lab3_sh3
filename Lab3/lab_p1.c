@@ -63,13 +63,18 @@ void *deposit(void *param)
 {
     int value = atoi(param);
 
-    /* TODO: pthread_mutex_lock(&mutex)       (print error if it fails) */
+    if (pthread_mutex_lock(&mutex) != 0) {
+        printf("Error: deposit failed to lock mutex\n");
+        pthread_exit(0);
+    }
 
     /* critical section */
-    /* TODO: amount += value;
-     *       print "Deposit amount = %d\n" with the new amount */
+    amount += value;
+    printf("Deposit amount = %d\n", amount);
 
-    /* TODO: pthread_mutex_unlock(&mutex)     (print error if it fails) */
+    if (pthread_mutex_unlock(&mutex) != 0) {
+        printf("Error: deposit failed to unlock mutex\n");
+    }
 
     pthread_exit(0);
 }
@@ -79,13 +84,18 @@ void *withdraw(void *param)
 {
     int value = atoi(param);
 
-    /* TODO: pthread_mutex_lock(&mutex)       (print error if it fails) */
+    if (pthread_mutex_lock(&mutex) != 0) {
+        printf("Error: withdraw failed to lock mutex\n");
+        pthread_exit(0);
+    }
 
     /* critical section */
-    /* TODO: amount -= value;
-     *       print "Withdrawal amount = %d\n" with the new amount */
+    amount -= value;
+    printf("Withdrawal amount = %d\n", amount);
 
-    /* TODO: pthread_mutex_unlock(&mutex)     (print error if it fails) */
+    if (pthread_mutex_unlock(&mutex) != 0) {
+        printf("Error: withdraw failed to unlock mutex\n");
+    }
 
     pthread_exit(0);
 }
